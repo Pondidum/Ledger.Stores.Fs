@@ -10,7 +10,7 @@ ci_run = ENV['APPVEYOR'] || false
 tool_nuget = 'tools/nuget/nuget.exe'
 tool_xunit = 'tools/xunit/xunit.console.exe'
 
-project_name = 'Ledger'
+project_name = 'Ledger.Stores.Fs'
 project_version = read_semver
 
 project_output = 'build/bin'
@@ -63,7 +63,7 @@ nugets_pack :pack do |n|
   n.exe = tool_nuget
   n.out = package_output
 
-  n.files = FileList["{#{project_name},#{project_name}.acceptance}/*.csproj"]
+  n.files = FileList["#{project_name}/*.csproj"]
 
   n.with_metadata do |m|
     m.description = 'A lightweight EventSourcing library'
