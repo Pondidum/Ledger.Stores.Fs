@@ -46,7 +46,6 @@ desc 'Run all unit test assemblies'
 test_runner :test do |xunit|
 
   files = FileList['**.Tests/bin/*/*.{acceptance,tests}.dll']
-  files.exclude(/.*Postgres.*/) if ci_run
 
   xunit.exe = tool_xunit
   xunit.files = files
@@ -66,12 +65,12 @@ nugets_pack :pack do |n|
   n.files = FileList["#{project_name}/*.csproj"]
 
   n.with_metadata do |m|
-    m.description = 'A lightweight EventSourcing library'
+    m.description = 'A FileSystem storage provider for Ledger'
     m.authors = 'Andy Dote'
     m.project_url = "https://github.com/pondidum/#{project_name}"
     m.license_url = "https://github.com/Pondidum/#{project_name}/blob/master/LICENSE.txt"
     m.version = project_version
-    m.tags = 'eventsourcing es'
+    m.tags = 'eventsourcing es filesystem ledger'
   end
 
 end
