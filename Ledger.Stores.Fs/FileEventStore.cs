@@ -69,7 +69,7 @@ namespace Ledger.Stores.Fs
 			}
 		}
 
-		public void SaveEvents(TKey aggregateID, IEnumerable<DomainEvent> changes)
+		public void SaveEvents(TKey aggregateID, IEnumerable<IDomainEvent> changes)
 		{
 			AppendTo(EventFile(), file =>
 			{
@@ -115,14 +115,14 @@ namespace Ledger.Stores.Fs
 				: (int?)null;
 		}
 
-		public IEnumerable<DomainEvent> LoadEvents(TKey aggregateID)
+		public IEnumerable<IDomainEvent> LoadEvents(TKey aggregateID)
 		{
 			return ReadFrom<EventDto<TKey>>(EventFile())
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Event);
 		}
 
-		public IEnumerable<DomainEvent> LoadEventsSince(TKey aggregateID, int sequenceID)
+		public IEnumerable<IDomainEvent> LoadEventsSince(TKey aggregateID, int sequenceID)
 		{
 			return LoadEvents(aggregateID)
 				.Where(e => e.Sequence > sequenceID);

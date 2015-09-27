@@ -32,13 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ledger, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Ledger.1.0.0\lib\net40\Ledger.dll</HintPath>
+    <Reference Include="Ledger, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ledger.2.0.0\lib\net40\Ledger.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Ledger.Acceptance, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Ledger.Acceptance.1.0.0\lib\net40\Ledger.Acceptance.dll</HintPath>
+      <HintPath>..\packages\Ledger.Acceptance.2.0.0\lib\net40\Ledger.Acceptance.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NSubstitute, Version=1.8.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
       <HintPath>..\packages\NSubstitute.1.8.2.0\lib\net45\NSubstitute.dll</HintPath>
