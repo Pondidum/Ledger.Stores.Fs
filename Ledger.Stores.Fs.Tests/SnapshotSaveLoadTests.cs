@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using Ledger.Acceptance.TestDomain;
+using Ledger.Acceptance.TestObjects;
+using Ledger.Conventions;
 using Shouldly;
 using Xunit;
 
@@ -10,6 +12,7 @@ namespace Ledger.Stores.Fs.Tests
 	{
 		private readonly string _root;
 		private readonly FileEventStore<Guid> _store;
+		private readonly StoreConventions _conventions;
 
 		public SnapshotSaveLoadTests()
 		{
@@ -17,6 +20,7 @@ namespace Ledger.Stores.Fs.Tests
 
 			Directory.CreateDirectory(_root);
 			_store = new FileEventStore<Guid>(_root);
+			_conventions = new StoreConventions(new KeyTypeNamingConvention(), typeof(Guid), typeof(TestAggregate));
 		}
 
 		[Fact]
@@ -24,9 +28,9 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.SaveSnapshot(id, new CandidateMemento());
+			_store.SaveSnapshot(_conventions, id, new CandidateMemento());
 
-			var loaded = _store.LoadLatestSnapshotFor(id);
+			var loaded = _store.LoadLatestSnapshotFor(_conventions, id);
 
 			loaded.ShouldBeOfType<CandidateMemento>();
 		}
@@ -36,11 +40,11 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.SaveSnapshot(id, new CandidateMemento { Sequence = 4 });
-			_store.SaveSnapshot(id, new CandidateMemento { Sequence = 5 });
+			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 4 });
+			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 5 });
 
 			_store
-				.LoadLatestSnapshotFor(id)
+				.LoadLatestSnapshotFor(_conventions, id)
 				.Sequence
 				.ShouldBe(5);
 		}
@@ -50,11 +54,11 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.SaveSnapshot(id, new CandidateMemento { Sequence = 4 });
-			_store.SaveSnapshot(id, new CandidateMemento { Sequence = 5 });
+			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 4 });
+			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 5 });
 
 			_store
-				.GetLatestSnapshotSequenceFor(id)
+				.GetLatestSnapshotSequenceFor(_conventions, id)
 				.ShouldBe(5);
 		}
 
@@ -64,7 +68,7 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			var loaded = _store.LoadLatestSnapshotFor(id);
+			var loaded = _store.LoadLatestSnapshotFor(_conventions, id);
 
 			loaded.ShouldBe(null);
 		}

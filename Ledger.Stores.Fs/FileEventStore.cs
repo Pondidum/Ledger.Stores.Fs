@@ -27,14 +27,14 @@ namespace Ledger.Stores.Fs
 
 		public string Directory { get { return _directory; } }
 
-		private string EventFile()
+		private string EventFile(IStoreConventions conventions)
 		{
-			return Path.Combine(_directory, typeof(TKey).Name + ".events.json");
+			return Path.Combine(_directory, conventions.EventStoreName() + ".json");
 		}
 
-		private string SnapshotFile()
+		private string SnapshotFile(IStoreConventions conventions)
 		{
-			return Path.Combine(_directory, typeof(TKey).Name + ".snapshots.json");
+			return Path.Combine(_directory, conventions.SnapshotStoreName() + ".json");
 		}
 
 		private void AppendTo(string filepath, Action<StreamWriter> action)
@@ -69,9 +69,9 @@ namespace Ledger.Stores.Fs
 			}
 		}
 
-		public void SaveEvents(TKey aggregateID, IEnumerable<IDomainEvent> changes)
+		public void SaveEvents(IStoreConventions conventions, TKey aggregateID, IEnumerable<IDomainEvent> changes)
 		{
-			AppendTo(EventFile(), file =>
+			AppendTo(EventFile(conventions), file =>
 			{
 				changes.ForEach(change =>
 				{
@@ -83,9 +83,9 @@ namespace Ledger.Stores.Fs
 			});
 		}
 
-		public void SaveSnapshot(TKey aggregateID, ISequenced snapshot)
+		public void SaveSnapshot(IStoreConventions conventions, TKey aggregateID, ISequenced snapshot)
 		{
-			AppendTo(SnapshotFile(), file =>
+			AppendTo(SnapshotFile(conventions), file =>
 			{
 				var dto = new SnapshotDto<TKey> {ID = aggregateID, Snapshot = snapshot};
 				var json = JsonConvert.SerializeObject(dto, _jsonSettings);
@@ -99,38 +99,38 @@ namespace Ledger.Stores.Fs
 			return this;
 		}
 
-		public int? GetLatestSequenceFor(TKey aggregateID)
+		public int? GetLatestSequenceFor(IStoreConventions conventions, TKey aggregateID)
 		{
-			return LoadEvents(aggregateID)
+			return LoadEvents(conventions, aggregateID)
 				.Select(e => (int?) e.Sequence)
 				.Max();
 		}
 
-		public int? GetLatestSnapshotSequenceFor(TKey aggregateID)
+		public int? GetLatestSnapshotSequenceFor(IStoreConventions conventions, TKey aggregateID)
 		{
-			var snapshot = LoadLatestSnapshotFor(aggregateID);
+			var snapshot = LoadLatestSnapshotFor(conventions, aggregateID);
 
 			return snapshot != null
 				? snapshot.Sequence
 				: (int?)null;
 		}
 
-		public IEnumerable<IDomainEvent> LoadEvents(TKey aggregateID)
+		public IEnumerable<IDomainEvent> LoadEvents(IStoreConventions conventions, TKey aggregateID)
 		{
-			return ReadFrom<EventDto<TKey>>(EventFile())
+			return ReadFrom<EventDto<TKey>>(EventFile(conventions))
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Event);
 		}
 
-		public IEnumerable<IDomainEvent> LoadEventsSince(TKey aggregateID, int sequenceID)
+		public IEnumerable<IDomainEvent> LoadEventsSince(IStoreConventions conventions, TKey aggregateID, int sequenceID)
 		{
-			return LoadEvents(aggregateID)
+			return LoadEvents(conventions, aggregateID)
 				.Where(e => e.Sequence > sequenceID);
 		}
 
-		public ISequenced LoadLatestSnapshotFor(TKey aggregateID)
+		public ISequenced LoadLatestSnapshotFor(IStoreConventions conventions, TKey aggregateID)
 		{
-			return ReadFrom<SnapshotDto<TKey>>(SnapshotFile())
+			return ReadFrom<SnapshotDto<TKey>>(SnapshotFile(conventions))
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Snapshot)
 				.Cast<ISequenced>()
