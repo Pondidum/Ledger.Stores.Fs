@@ -22,7 +22,7 @@ namespace Ledger.Stores.Fs
 		{
 			_fileSystem = fs;
 			_directory = directory;
-			_jsonSettings = new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Objects};
+			_jsonSettings = new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto};
 		}
 
 		public string Directory { get { return _directory; } }
