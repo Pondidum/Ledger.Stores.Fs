@@ -11,7 +11,7 @@ namespace Ledger.Stores.Fs.Tests
 	public class SnapshotSaveLoadTests : IDisposable
 	{
 		private readonly string _root;
-		private readonly FileEventStore<Guid> _store;
+		private readonly FileEventStore _store;
 		private readonly StoreConventions _conventions;
 
 		public SnapshotSaveLoadTests()
@@ -19,7 +19,7 @@ namespace Ledger.Stores.Fs.Tests
 			_root = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
 			Directory.CreateDirectory(_root);
-			_store = new FileEventStore<Guid>(_root);
+			_store = new FileEventStore(_root);
 			_conventions = new StoreConventions(new KeyTypeNamingConvention(), typeof(Guid), typeof(TestAggregate));
 		}
 
@@ -28,9 +28,9 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.SaveSnapshot(_conventions, id, new CandidateMemento());
+			_store.CreateWriter<Guid>(_conventions).SaveSnapshot(id, new CandidateMemento());
 
-			var loaded = _store.LoadLatestSnapshotFor(_conventions, id);
+			var loaded = _store.CreateReader<Guid>(_conventions).LoadLatestSnapshotFor(id);
 
 			loaded.ShouldBeOfType<CandidateMemento>();
 		}
@@ -40,11 +40,15 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 4 });
-			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 5 });
+			using (var writer = _store.CreateWriter<Guid>(_conventions))
+			{
+				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 4});
+				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 5});
+			}
 
 			_store
-				.LoadLatestSnapshotFor(_conventions, id)
+				.CreateReader<Guid>(_conventions)
+				.LoadLatestSnapshotFor(id)
 				.Sequence
 				.ShouldBe(5);
 		}
@@ -54,12 +58,15 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 4 });
-			_store.SaveSnapshot(_conventions, id, new CandidateMemento { Sequence = 5 });
+			using (var writer = _store.CreateWriter<Guid>(_conventions))
+			{
+				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 4});
+				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 5});
 
-			_store
-				.GetLatestSnapshotSequenceFor(_conventions, id)
-				.ShouldBe(5);
+				writer
+					.GetLatestSnapshotSequenceFor(id)
+					.ShouldBe(5);
+			}
 		}
 
 
@@ -68,7 +75,7 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			var loaded = _store.LoadLatestSnapshotFor(_conventions, id);
+			var loaded = _store.CreateReader<Guid>(_conventions).LoadLatestSnapshotFor(id);
 
 			loaded.ShouldBe(null);
 		}

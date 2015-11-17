@@ -7,11 +7,11 @@ namespace Ledger.Stores.Fs.Tests
 	{
 		public AcceptanceRegistry()
 		{
-			For<IEventStore<Guid>>().Use<WrappedStore<Guid>>();
+			For<IEventStore>().Use<WrappedStore>();
 		}
 	}
 
-	public class WrappedStore<TKey> : FileEventStore<TKey>
+	public class WrappedStore : FileEventStore
 	{
 		public WrappedStore()
 			: base(Guid.NewGuid().ToString())
