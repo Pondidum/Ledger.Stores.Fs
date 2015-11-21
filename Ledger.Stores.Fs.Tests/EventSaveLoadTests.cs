@@ -28,14 +28,14 @@ namespace Ledger.Stores.Fs.Tests
 		[Fact]
 		public void The_events_should_keep_types()
 		{
+			var id = Guid.NewGuid();
 			var toSave = new DomainEvent<Guid>[]
 			{
-				new NameChangedByDeedPoll {NewName = "Deed"},
-				new FixNameSpelling {NewName = "Fix"},
+				new NameChangedByDeedPoll {AggregateID = id, NewName = "Deed"},
+				new FixNameSpelling {AggregateID = id, NewName = "Fix"},
 			};
 
-			var id = Guid.NewGuid();
-			_store.CreateWriter<Guid>(_conventions).SaveEvents(id, toSave);
+			_store.CreateWriter<Guid>(_conventions).SaveEvents(toSave);
 
 			var loaded = _store.CreateReader<Guid>(_conventions).LoadEvents(id);
 
@@ -51,8 +51,8 @@ namespace Ledger.Stores.Fs.Tests
 
 			using (var writer = _store.CreateWriter<Guid>(_conventions))
 			{
-				writer.SaveEvents(first, new[] { new FixNameSpelling { NewName = "Fix" } });
-				writer.SaveEvents(second, new[] { new NameChangedByDeedPoll { NewName = "Deed" } });
+				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, NewName = "Fix" } });
+				writer.SaveEvents(new[] { new NameChangedByDeedPoll { AggregateID = second, NewName = "Deed" } });
 			}
 
 			var loaded = _store.CreateReader<Guid>(_conventions).LoadEvents(first);
@@ -68,9 +68,9 @@ namespace Ledger.Stores.Fs.Tests
 
 			using (var writer = _store.CreateWriter<Guid>(_conventions))
 			{
-				writer.SaveEvents(first, new[] { new FixNameSpelling { Sequence = 4 } });
-				writer.SaveEvents(first, new[] { new FixNameSpelling { Sequence = 5 } });
-				writer.SaveEvents(second, new[] { new NameChangedByDeedPoll { Sequence = 6 } });
+				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Sequence = 4 } });
+				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Sequence = 5 } });
+				writer.SaveEvents(new[] { new NameChangedByDeedPoll {AggregateID = second, Sequence = 6 } });
 
 				writer
 					.GetLatestSequenceFor(first)
@@ -81,17 +81,17 @@ namespace Ledger.Stores.Fs.Tests
 		[Fact]
 		public void Loading_events_since_only_gets_events_after_the_sequence()
 		{
-			var toSave = new DomainEvent<Guid>[]
-			{
-				new NameChangedByDeedPoll { Sequence = 3 },
-				new FixNameSpelling { Sequence = 4 },
-				new FixNameSpelling { Sequence = 5 },
-				new FixNameSpelling { Sequence = 6 },
-			};
-
 			var id = Guid.NewGuid();
 
-			_store.CreateWriter<Guid>(_conventions).SaveEvents(id, toSave);
+			var toSave = new DomainEvent<Guid>[]
+			{
+				new NameChangedByDeedPoll { AggregateID = id, Sequence = 3 },
+				new FixNameSpelling { AggregateID = id, Sequence = 4 },
+				new FixNameSpelling { AggregateID = id, Sequence = 5 },
+				new FixNameSpelling { AggregateID = id, Sequence = 6 },
+			};
+
+			_store.CreateWriter<Guid>(_conventions).SaveEvents(toSave);
 
 			var loaded = _store.CreateReader<Guid>(_conventions).LoadEventsSince(id, 4);
 

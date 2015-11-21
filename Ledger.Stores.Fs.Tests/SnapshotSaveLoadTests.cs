@@ -28,7 +28,7 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.CreateWriter<Guid>(_conventions).SaveSnapshot(id, new CandidateMemento());
+			_store.CreateWriter<Guid>(_conventions).SaveSnapshot(new CandidateMemento { AggregateID = id });
 
 			var loaded = _store.CreateReader<Guid>(_conventions).LoadLatestSnapshotFor(id);
 
@@ -42,8 +42,8 @@ namespace Ledger.Stores.Fs.Tests
 
 			using (var writer = _store.CreateWriter<Guid>(_conventions))
 			{
-				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 4});
-				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 5});
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 4 });
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 5 });
 			}
 
 			_store
@@ -60,8 +60,8 @@ namespace Ledger.Stores.Fs.Tests
 
 			using (var writer = _store.CreateWriter<Guid>(_conventions))
 			{
-				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 4});
-				writer.SaveSnapshot(id, new CandidateMemento {Sequence = 5});
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id , Sequence = 4 });
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id , Sequence = 5 });
 
 				writer
 					.GetLatestSnapshotSequenceFor(id)

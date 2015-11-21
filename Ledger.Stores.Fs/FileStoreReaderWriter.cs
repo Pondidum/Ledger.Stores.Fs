@@ -76,13 +76,13 @@ namespace Ledger.Stores.Fs
 			}
 		}
 
-		public void SaveEvents(TKey aggregateID, IEnumerable<IDomainEvent<TKey>> changes)
+		public void SaveEvents(IEnumerable<IDomainEvent<TKey>> changes)
 		{
 			AppendTo(_eventPath, file =>
 			{
 				changes.ForEach(change =>
 				{
-					var dto = new EventDto<TKey> {ID = aggregateID, Event = change};
+					var dto = new EventDto<TKey> {ID = change.AggregateID, Event = change};
 					var json = JsonConvert.SerializeObject(dto, _jsonSettings);
 
 					file.WriteLine(json);
@@ -90,11 +90,11 @@ namespace Ledger.Stores.Fs
 			});
 		}
 
-		public void SaveSnapshot(TKey aggregateID, ISnapshot<TKey> snapshot)
+		public void SaveSnapshot(ISnapshot<TKey> snapshot)
 		{
 			AppendTo(_snapshotPath, file =>
 			{
-				var dto = new SnapshotDto<TKey> {ID = aggregateID, Snapshot = snapshot};
+				var dto = new SnapshotDto<TKey> {ID = snapshot.AggregateID, Snapshot = snapshot};
 				var json = JsonConvert.SerializeObject(dto, _jsonSettings);
 
 				file.WriteLine(json);
