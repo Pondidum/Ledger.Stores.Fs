@@ -35,12 +35,12 @@ namespace Ledger.Stores.Fs
 				.Where(e => e.Sequence > sequenceID);
 		}
 
-		public ISequenced LoadLatestSnapshotFor(TKey aggregateID)
+		public ISnapshot<TKey> LoadLatestSnapshotFor(TKey aggregateID)
 		{
 			return ReadFrom<SnapshotDto<TKey>>(_snapshotPath)
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Snapshot)
-				.Cast<ISequenced>()
+				.Cast<ISnapshot<TKey>>()
 				.LastOrDefault();
 		}
 
@@ -90,7 +90,7 @@ namespace Ledger.Stores.Fs
 			});
 		}
 
-		public void SaveSnapshot(TKey aggregateID, ISequenced snapshot)
+		public void SaveSnapshot(TKey aggregateID, ISnapshot<TKey> snapshot)
 		{
 			AppendTo(_snapshotPath, file =>
 			{
