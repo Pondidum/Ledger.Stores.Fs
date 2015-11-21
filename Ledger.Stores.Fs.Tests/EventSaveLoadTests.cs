@@ -28,7 +28,7 @@ namespace Ledger.Stores.Fs.Tests
 		[Fact]
 		public void The_events_should_keep_types()
 		{
-			var toSave = new DomainEvent[]
+			var toSave = new DomainEvent<Guid>[]
 			{
 				new NameChangedByDeedPoll {NewName = "Deed"},
 				new FixNameSpelling {NewName = "Fix"},
@@ -81,7 +81,7 @@ namespace Ledger.Stores.Fs.Tests
 		[Fact]
 		public void Loading_events_since_only_gets_events_after_the_sequence()
 		{
-			var toSave = new DomainEvent[]
+			var toSave = new DomainEvent<Guid>[]
 			{
 				new NameChangedByDeedPoll { Sequence = 3 },
 				new FixNameSpelling { Sequence = 4 },

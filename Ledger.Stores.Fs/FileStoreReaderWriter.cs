@@ -22,14 +22,14 @@ namespace Ledger.Stores.Fs
 			_snapshotPath = snapshotPath;
 		}
 
-		public IEnumerable<IDomainEvent> LoadEvents(TKey aggregateID)
+		public IEnumerable<IDomainEvent<TKey>> LoadEvents(TKey aggregateID)
 		{
 			return ReadFrom<EventDto<TKey>>(_eventPath)
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Event);
 		}
 
-		public IEnumerable<IDomainEvent> LoadEventsSince(TKey aggregateID, int sequenceID)
+		public IEnumerable<IDomainEvent<TKey>> LoadEventsSince(TKey aggregateID, int sequenceID)
 		{
 			return LoadEvents(aggregateID)
 				.Where(e => e.Sequence > sequenceID);
@@ -76,7 +76,7 @@ namespace Ledger.Stores.Fs
 			}
 		}
 
-		public void SaveEvents(TKey aggregateID, IEnumerable<IDomainEvent> changes)
+		public void SaveEvents(TKey aggregateID, IEnumerable<IDomainEvent<TKey>> changes)
 		{
 			AppendTo(_eventPath, file =>
 			{
