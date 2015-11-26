@@ -25,32 +25,32 @@ namespace Ledger.Stores.Fs
 		}
 
 
-		public IStoreReader<TKey> CreateReader<TKey>(IStoreConventions storeConventions)
+		public IStoreReader<TKey> CreateReader<TKey>(string stream)
 		{
 			return new FileStoreReaderWriter<TKey>(
 				_fileSystem,
 				_jsonSettings,
-				EventFile(storeConventions),
-				SnapshotFile(storeConventions));
+				EventFile(stream),
+				SnapshotFile(stream));
 		}
 
-		public IStoreWriter<TKey> CreateWriter<TKey>(IStoreConventions storeConventions)
+		public IStoreWriter<TKey> CreateWriter<TKey>(string stream)
 		{
 			return new FileStoreReaderWriter<TKey>(
 				_fileSystem,
 				_jsonSettings,
-				EventFile(storeConventions),
-				SnapshotFile(storeConventions));
+				EventFile(stream),
+				SnapshotFile(stream));
 		}
 
-		private string EventFile(IStoreConventions conventions)
+		private string EventFile(string stream)
 		{
-			return Path.Combine(Directory, conventions.EventStoreName() + ".json");
+			return Path.Combine(Directory, stream + ".events.json");
 		}
 
-		private string SnapshotFile(IStoreConventions conventions)
+		private string SnapshotFile(string stream)
 		{
-			return Path.Combine(Directory, conventions.SnapshotStoreName() + ".json");
+			return Path.Combine(Directory, stream + ".snapshots.json");
 		}
 
 	}

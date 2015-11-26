@@ -2,9 +2,6 @@
 using System.IO;
 using System.Linq;
 using Ledger.Acceptance.TestDomain.Events;
-using Ledger.Acceptance.TestObjects;
-using Ledger.Conventions;
-using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -12,9 +9,10 @@ namespace Ledger.Stores.Fs.Tests
 {
 	public class EventSaveLoadTests : IDisposable
 	{
+		private const string StreamName = "streamName";
+
 		private readonly string _root;
 		private readonly FileEventStore _store;
-		private readonly StoreConventions _conventions;
 
 		public EventSaveLoadTests()
 		{
@@ -22,7 +20,6 @@ namespace Ledger.Stores.Fs.Tests
 
 			Directory.CreateDirectory(_root);
 			_store = new FileEventStore(_root);
-			_conventions = new StoreConventions(new KeyTypeNamingConvention(), typeof(Guid), typeof(TestAggregate));
 		}
 
 		[Fact]
@@ -35,9 +32,9 @@ namespace Ledger.Stores.Fs.Tests
 				new FixNameSpelling {AggregateID = id, NewName = "Fix"},
 			};
 
-			_store.CreateWriter<Guid>(_conventions).SaveEvents(toSave);
+			_store.CreateWriter<Guid>(StreamName).SaveEvents(toSave);
 
-			var loaded = _store.CreateReader<Guid>(_conventions).LoadEvents(id);
+			var loaded = _store.CreateReader<Guid>(StreamName).LoadEvents(id);
 
 			loaded.First().ShouldBeOfType<NameChangedByDeedPoll>();
 			loaded.Last().ShouldBeOfType<FixNameSpelling>();
@@ -49,13 +46,13 @@ namespace Ledger.Stores.Fs.Tests
 			var first = Guid.NewGuid();
 			var second = Guid.NewGuid();
 
-			using (var writer = _store.CreateWriter<Guid>(_conventions))
+			using (var writer = _store.CreateWriter<Guid>(StreamName))
 			{
 				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, NewName = "Fix" } });
 				writer.SaveEvents(new[] { new NameChangedByDeedPoll { AggregateID = second, NewName = "Deed" } });
 			}
 
-			var loaded = _store.CreateReader<Guid>(_conventions).LoadEvents(first);
+			var loaded = _store.CreateReader<Guid>(StreamName).LoadEvents(first);
 
 			loaded.Single().ShouldBeOfType<FixNameSpelling>();
 		}
@@ -66,7 +63,7 @@ namespace Ledger.Stores.Fs.Tests
 			var first = Guid.NewGuid();
 			var second = Guid.NewGuid();
 
-			using (var writer = _store.CreateWriter<Guid>(_conventions))
+			using (var writer = _store.CreateWriter<Guid>(StreamName))
 			{
 				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Sequence = 4 } });
 				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Sequence = 5 } });
@@ -91,9 +88,9 @@ namespace Ledger.Stores.Fs.Tests
 				new FixNameSpelling { AggregateID = id, Sequence = 6 },
 			};
 
-			_store.CreateWriter<Guid>(_conventions).SaveEvents(toSave);
+			_store.CreateWriter<Guid>(StreamName).SaveEvents(toSave);
 
-			var loaded = _store.CreateReader<Guid>(_conventions).LoadEventsSince(id, 4);
+			var loaded = _store.CreateReader<Guid>(StreamName).LoadEventsSince(id, 4);
 
 			loaded.Select(x => x.Sequence).ShouldBe(new[] { 5, 6 });
 		}
@@ -103,7 +100,7 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			var loaded = _store.CreateReader<Guid>(_conventions).LoadEventsSince(id, 4);
+			var loaded = _store.CreateReader<Guid>(StreamName).LoadEventsSince(id, 4);
 
 			loaded.ShouldBeEmpty();
 		}

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using Ledger.Acceptance.TestDomain;
-using Ledger.Acceptance.TestObjects;
-using Ledger.Conventions;
 using Shouldly;
 using Xunit;
 
@@ -10,9 +8,10 @@ namespace Ledger.Stores.Fs.Tests
 {
 	public class SnapshotSaveLoadTests : IDisposable
 	{
+		private const string StreamName = "streamName";
+
 		private readonly string _root;
 		private readonly FileEventStore _store;
-		private readonly StoreConventions _conventions;
 
 		public SnapshotSaveLoadTests()
 		{
@@ -20,7 +19,6 @@ namespace Ledger.Stores.Fs.Tests
 
 			Directory.CreateDirectory(_root);
 			_store = new FileEventStore(_root);
-			_conventions = new StoreConventions(new KeyTypeNamingConvention(), typeof(Guid), typeof(TestAggregate));
 		}
 
 		[Fact]
@@ -28,9 +26,9 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			_store.CreateWriter<Guid>(_conventions).SaveSnapshot(new CandidateMemento { AggregateID = id });
+			_store.CreateWriter<Guid>(StreamName).SaveSnapshot(new CandidateMemento { AggregateID = id });
 
-			var loaded = _store.CreateReader<Guid>(_conventions).LoadLatestSnapshotFor(id);
+			var loaded = _store.CreateReader<Guid>(StreamName).LoadLatestSnapshotFor(id);
 
 			loaded.ShouldBeOfType<CandidateMemento>();
 		}
@@ -40,14 +38,14 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			using (var writer = _store.CreateWriter<Guid>(_conventions))
+			using (var writer = _store.CreateWriter<Guid>(StreamName))
 			{
 				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 4 });
 				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 5 });
 			}
 
 			_store
-				.CreateReader<Guid>(_conventions)
+				.CreateReader<Guid>(StreamName)
 				.LoadLatestSnapshotFor(id)
 				.Sequence
 				.ShouldBe(5);
@@ -58,10 +56,10 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			using (var writer = _store.CreateWriter<Guid>(_conventions))
+			using (var writer = _store.CreateWriter<Guid>(StreamName))
 			{
-				writer.SaveSnapshot(new CandidateMemento { AggregateID = id , Sequence = 4 });
-				writer.SaveSnapshot(new CandidateMemento { AggregateID = id , Sequence = 5 });
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 4 });
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 5 });
 
 				writer
 					.GetLatestSnapshotSequenceFor(id)
@@ -75,7 +73,7 @@ namespace Ledger.Stores.Fs.Tests
 		{
 			var id = Guid.NewGuid();
 
-			var loaded = _store.CreateReader<Guid>(_conventions).LoadLatestSnapshotFor(id);
+			var loaded = _store.CreateReader<Guid>(StreamName).LoadLatestSnapshotFor(id);
 
 			loaded.ShouldBe(null);
 		}
