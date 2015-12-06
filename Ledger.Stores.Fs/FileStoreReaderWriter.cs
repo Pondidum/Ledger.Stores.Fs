@@ -29,10 +29,19 @@ namespace Ledger.Stores.Fs
 				.Select(dto => dto.Event);
 		}
 
-		public IEnumerable<IDomainEvent<TKey>> LoadEventsSince(TKey aggregateID, int sequenceID)
+		public IEnumerable<IDomainEvent<TKey>> LoadEventsSince(TKey aggregateID, DateTime stamp)
 		{
 			return LoadEvents(aggregateID)
-				.Where(e => e.Sequence > sequenceID);
+				.Where(e => e.Stamp > stamp);
+		}
+
+		public int GetNumberOfEventsSinceSnapshotFor(TKey aggregateID)
+		{
+			var last = LoadLatestSnapshotFor(aggregateID);
+			var stamp = last?.Stamp ?? DateTime.MinValue;
+
+			return LoadEvents(aggregateID)
+				.Count(e => e.Stamp > stamp);
 		}
 
 		public ISnapshot<TKey> LoadLatestSnapshotFor(TKey aggregateID)
@@ -107,20 +116,11 @@ namespace Ledger.Stores.Fs
 			});
 		}
 
-		public int? GetLatestSequenceFor(TKey aggregateID)
+		public DateTime? GetLatestStampFor(TKey aggregateID)
 		{
 			return LoadEvents(aggregateID)
-				.Select(e => (int?) e.Sequence)
+				.Select(e => (DateTime?) e.Stamp)
 				.Max();
-		}
-
-		public int? GetLatestSnapshotSequenceFor(TKey aggregateID)
-		{
-			var snapshot = LoadLatestSnapshotFor(aggregateID);
-
-			return snapshot != null
-				? snapshot.Sequence
-				: (int?) null;
 		}
 
 		public virtual void Dispose()

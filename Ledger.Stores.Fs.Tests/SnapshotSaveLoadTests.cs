@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Ledger.Acceptance;
 using Ledger.Acceptance.TestDomain;
 using Shouldly;
 using Xunit;
@@ -12,6 +13,7 @@ namespace Ledger.Stores.Fs.Tests
 
 		private readonly string _root;
 		private readonly FileEventStore _store;
+		private readonly IncrementingStamper _stamper;
 
 		public SnapshotSaveLoadTests()
 		{
@@ -19,6 +21,8 @@ namespace Ledger.Stores.Fs.Tests
 
 			Directory.CreateDirectory(_root);
 			_store = new FileEventStore(_root);
+
+			_stamper = new IncrementingStamper();
 		}
 
 		[Fact]
@@ -40,33 +44,16 @@ namespace Ledger.Stores.Fs.Tests
 
 			using (var writer = _store.CreateWriter<Guid>(StreamName))
 			{
-				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 4 });
-				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 5 });
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Stamp = _stamper.Offset(4) });
+				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Stamp = _stamper.Offset(5) });
 			}
 
 			_store
 				.CreateReader<Guid>(StreamName)
 				.LoadLatestSnapshotFor(id)
-				.Sequence
-				.ShouldBe(5);
+				.Stamp
+				.ShouldBe(_stamper.Offset(5));
 		}
-
-		[Fact]
-		public void The_most_recent_snapshot_id_should_be_found()
-		{
-			var id = Guid.NewGuid();
-
-			using (var writer = _store.CreateWriter<Guid>(StreamName))
-			{
-				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 4 });
-				writer.SaveSnapshot(new CandidateMemento { AggregateID = id, Sequence = 5 });
-
-				writer
-					.GetLatestSnapshotSequenceFor(id)
-					.ShouldBe(5);
-			}
-		}
-
 
 		[Fact]
 		public void When_there_is_no_snapshot_file_and_load_is_called()
