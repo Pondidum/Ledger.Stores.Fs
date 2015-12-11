@@ -59,6 +59,12 @@ namespace Ledger.Stores.Fs
 				.Select(dto => dto.ID);
 		}
 
+		public IEnumerable<IDomainEvent<TKey>> LoadAllEvents()
+		{
+			return ReadFrom<EventDto<TKey>>(_eventPath)
+				.Select(dto => dto.Event);
+		}
+
 		private IEnumerable<TDto> ReadFrom<TDto>(string filepath)
 		{
 			if (_fileSystem.FileExists(filepath) == false)
