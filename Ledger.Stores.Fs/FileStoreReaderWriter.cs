@@ -56,7 +56,8 @@ namespace Ledger.Stores.Fs
 		public IEnumerable<TKey> LoadAllKeys()
 		{
 			return ReadFrom<EventDto<TKey>>(_eventPath)
-				.Select(dto => dto.ID);
+				.Select(dto => dto.ID)
+				.Distinct();
 		}
 
 		public IEnumerable<IDomainEvent<TKey>> LoadAllEvents()
