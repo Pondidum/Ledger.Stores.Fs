@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Ledger.Acceptance;
+using Ledger.Acceptance.TestDomain.Events;
 using Ledger.Acceptance.TestObjects;
 using Shouldly;
 using Xunit;
@@ -46,6 +48,38 @@ namespace Ledger.Stores.Fs.Tests
 			using (var reader = _store.CreateReader<Guid>(StreamName))
 			{
 				reader.LoadAllKeys().ShouldBe(new[] { firstID, secondID }, true);
+			}
+		}
+
+
+		[Fact]
+		public void When_loading_all_events()
+		{
+			var firstID = Guid.NewGuid();
+			var secondID = Guid.NewGuid();
+
+			using (var writer = _store.CreateWriter<Guid>(StreamName))
+			{
+				writer.SaveEvents(new IDomainEvent<Guid>[]
+				{
+					new CandidateCreated { AggregateID = firstID, Stamp = _stamper.GetNext() },
+					new AddEmailAddress { AggregateID = firstID, Stamp = _stamper.GetNext() },
+					new FixNameSpelling  { AggregateID = secondID, Stamp = _stamper.GetNext() },
+					new NameChangedByDeedPoll { AggregateID = firstID, Stamp = _stamper.GetNext() },
+					new AddEmailAddress { AggregateID = secondID, Stamp = _stamper.GetNext() },
+				});
+			}
+
+			using (var reader = _store.CreateReader<Guid>(StreamName))
+			{
+				reader.LoadAllEvents().Select(e => e.GetType()).ShouldBe(new[]
+				{
+					typeof(CandidateCreated),
+					typeof(AddEmailAddress),
+					typeof(FixNameSpelling),
+					typeof(NameChangedByDeedPoll),
+					typeof(AddEmailAddress)
+				});
 			}
 		}
 	}
