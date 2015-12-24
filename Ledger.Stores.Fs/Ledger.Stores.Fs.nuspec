@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Ledger.Stores.Fs</id>
+    <title>Ledger.Stores.Fs</title>
+    <version>$version$</version>
+    <authors>Andy Dote</authors>
+    <description>A FileSystem storage provider for Ledger</description>
+    <projectUrl>https://github.com/pondidum/ledger.stores.fs</projectUrl>
+    <licenseUrl>https://github.com/Pondidum/ledger.stores.fs/blob/master/LICENSE.txt</licenseUrl>
+    <tags>eventsourcing es filesystem ledger</tags>
+  </metadata>
+</package>
