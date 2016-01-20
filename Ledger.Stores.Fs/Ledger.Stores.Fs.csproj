@@ -49,7 +49,9 @@
   <ItemGroup>
     <Compile Include="EventDto.cs" />
     <Compile Include="FileEventStore.cs" />
-    <Compile Include="FileStoreReaderWriter.cs" />
+    <Compile Include="FileStore.cs" />
+    <Compile Include="FileStoreReader.cs" />
+    <Compile Include="FileStoreWriter.cs" />
     <Compile Include="IFileSystem.cs" />
     <Compile Include="PhysicalFileSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
