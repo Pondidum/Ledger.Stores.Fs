@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Ledger.Acceptance;
 using Ledger.Acceptance.TestDomain.Events;
+using Newtonsoft.Json;
 using Shouldly;
 using Xunit;
 
@@ -10,7 +11,7 @@ namespace Ledger.Stores.Fs.Tests
 {
 	public class EventSaveLoadTests : IDisposable
 	{
-		private const string StreamName = "streamName";
+		private static readonly EventStoreContext StreamName =  new EventStoreContext("streamName", Default.SerializerSettings);
 
 		private readonly string _root;
 		private readonly FileEventStore _store;

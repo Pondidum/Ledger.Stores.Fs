@@ -7,7 +7,6 @@ namespace Ledger.Stores.Fs
 	public class FileEventStore : IEventStore
 	{
 		private readonly IFileSystem _fileSystem;
-		private readonly JsonSerializerSettings _jsonSettings;
 
 		public string Directory { get; }
 
@@ -19,28 +18,26 @@ namespace Ledger.Stores.Fs
 		public FileEventStore(IFileSystem fs, string directory)
 		{
 			_fileSystem = fs;
-			_jsonSettings = new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto};
 
 			Directory = directory;
 		}
 
-
-		public IStoreReader<TKey> CreateReader<TKey>(string stream)
+		public IStoreReader<TKey> CreateReader<TKey>(EventStoreContext context)
 		{
-			return new FileStoreReaderWriter<TKey>(
+			return new FileStoreReader<TKey>(
 				_fileSystem,
-				_jsonSettings,
-				EventFile(stream),
-				SnapshotFile(stream));
+				context.SerializerSettings,
+				EventFile(context.StreamName),
+				SnapshotFile(context.StreamName));
 		}
 
-		public IStoreWriter<TKey> CreateWriter<TKey>(string stream)
+		public IStoreWriter<TKey> CreateWriter<TKey>(EventStoreContext context)
 		{
-			return new FileStoreReaderWriter<TKey>(
+			return new FileStoreWriter<TKey>(
 				_fileSystem,
-				_jsonSettings,
-				EventFile(stream),
-				SnapshotFile(stream));
+				context.SerializerSettings,
+				EventFile(context.StreamName),
+				SnapshotFile(context.StreamName));
 		}
 
 		private string EventFile(string stream)
@@ -54,4 +51,5 @@ namespace Ledger.Stores.Fs
 		}
 
 	}
+
 }

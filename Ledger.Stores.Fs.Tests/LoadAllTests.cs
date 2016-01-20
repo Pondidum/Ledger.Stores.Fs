@@ -4,6 +4,7 @@ using System.Linq;
 using Ledger.Acceptance;
 using Ledger.Acceptance.TestDomain.Events;
 using Ledger.Acceptance.TestObjects;
+using Newtonsoft.Json;
 using Shouldly;
 using Xunit;
 
@@ -11,7 +12,7 @@ namespace Ledger.Stores.Fs.Tests
 {
 	public class LoadAllTests
 	{
-		private const string StreamName = "LoadStream";
+		private static readonly EventStoreContext StreamName = new EventStoreContext("LoadStream", Default.SerializerSettings);
 
 		private readonly string _root;
 		private readonly FileEventStore _store;
