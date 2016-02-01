@@ -22,10 +22,13 @@ namespace Ledger.Stores.Fs
 			return LoadEvents(_eventPath, aggregateID);
 		}
 
-		public IEnumerable<IDomainEvent<TKey>> LoadEventsSince(TKey aggregateID, DateTime stamp)
+		public IEnumerable<IDomainEvent<TKey>> LoadEventsSince(TKey aggregateID, DateTime? stamp)
 		{
-			return LoadEvents(aggregateID)
-				.Where(e => e.Stamp > stamp);
+			var events = LoadEvents(aggregateID);
+
+			return stamp.HasValue
+				? events.Where(e => e.Stamp > stamp)
+				: events;
 		}
 
 		public ISnapshot<TKey> LoadLatestSnapshotFor(TKey aggregateID)
