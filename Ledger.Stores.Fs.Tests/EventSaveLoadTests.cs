@@ -70,13 +70,13 @@ namespace Ledger.Stores.Fs.Tests
 
 			using (var writer = _store.CreateWriter<Guid>(StreamName))
 			{
-				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Stamp = _stamper.Offset(4) } });
-				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Stamp = _stamper.Offset(5) } });
-				writer.SaveEvents(new[] { new NameChangedByDeedPoll {AggregateID = second, Stamp = _stamper.Offset(6) } });
+				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Sequence = 4} });
+				writer.SaveEvents(new[] { new FixNameSpelling { AggregateID = first, Sequence = 5 } });
+				writer.SaveEvents(new[] { new NameChangedByDeedPoll {AggregateID = second, Sequence = 6 } });
 
 				writer
-					.GetLatestStampFor(first)
-					.ShouldBe(_stamper.Offset(5));
+					.GetLatestSequenceFor(first)
+					.ShouldBe(5);
 			}
 		}
 

@@ -22,26 +22,26 @@ namespace Ledger.Stores.Fs
 		public int GetNumberOfEventsSinceSnapshotFor(TKey aggregateID)
 		{
 			var last = LoadLatestSnapshotFor(_snapshotPath, aggregateID);
-			var stamp = last?.Stamp ?? DateTime.MinValue;
+			var sequence = last?.Sequence ?? -1;
 
 			return LoadEvents(_eventPath, aggregateID)
-				.Count(e => e.Stamp > stamp);
+				.Count(e => e.Sequence > sequence);
 		}
 
-		public void SaveEvents(IEnumerable<IDomainEvent<TKey>> changes)
+		public void SaveEvents(IEnumerable<DomainEvent<TKey>> changes)
 		{
 			AppendTo(_eventPath, changes.Select(change => new EventDto<TKey> { ID = change.AggregateID, Event = change }));
 		}
 
-		public void SaveSnapshot(ISnapshot<TKey> snapshot)
+		public void SaveSnapshot(Snapshot<TKey> snapshot)
 		{
 			AppendTo(_snapshotPath, new[] { new SnapshotDto<TKey> { ID = snapshot.AggregateID, Snapshot = snapshot } });
 		}
 
-		public DateTime? GetLatestStampFor(TKey aggregateID)
+		public int? GetLatestSequenceFor(TKey aggregateID)
 		{
 			return LoadEvents(_eventPath, aggregateID)
-				.Select(e => (DateTime?)e.Stamp)
+				.Select(e => (int?)e.Sequence)
 				.Max();
 		}
 

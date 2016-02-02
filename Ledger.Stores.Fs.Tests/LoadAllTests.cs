@@ -61,7 +61,7 @@ namespace Ledger.Stores.Fs.Tests
 
 			using (var writer = _store.CreateWriter<Guid>(StreamName))
 			{
-				writer.SaveEvents(new IDomainEvent<Guid>[]
+				writer.SaveEvents(new DomainEvent<Guid>[]
 				{
 					new CandidateCreated { AggregateID = firstID, Stamp = _stamper.GetNext() },
 					new AddEmailAddress { AggregateID = firstID, Stamp = _stamper.GetNext() },

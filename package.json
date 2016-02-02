@@ -1,6 +1,6 @@
 {
   "name": "Ledger.Stores.Fs",
-  "version": "6.3.0",
+  "version": "7.0.0",
   "dependencies": {
     "gulp": "^3.9.0",
     "gulp-debug": "^2.1.2",

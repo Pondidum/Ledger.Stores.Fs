@@ -52,19 +52,19 @@ namespace Ledger.Stores.Fs
 			}
 		}
 
-		protected IEnumerable<IDomainEvent<TKey>> LoadEvents<TKey>(string eventPath, TKey aggregateID)
+		protected IEnumerable<DomainEvent<TKey>> LoadEvents<TKey>(string eventPath, TKey aggregateID)
 		{
 			return ReadFrom<EventDto<TKey>>(eventPath)
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Event);
 		}
 
-		protected ISnapshot<TKey> LoadLatestSnapshotFor<TKey>(string snapshotPath, TKey aggregateID)
+		protected Snapshot<TKey> LoadLatestSnapshotFor<TKey>(string snapshotPath, TKey aggregateID)
 		{
 			return ReadFrom<SnapshotDto<TKey>>(snapshotPath)
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Snapshot)
-				.Cast<ISnapshot<TKey>>()
+				.Cast<Snapshot<TKey>>()
 				.LastOrDefault();
 		}
 	}

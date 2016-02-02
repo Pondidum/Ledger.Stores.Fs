@@ -17,12 +17,12 @@ namespace Ledger.Stores.Fs
 			_snapshotPath = snapshotPath;
 		}
 
-		public IEnumerable<IDomainEvent<TKey>> LoadEvents(TKey aggregateID)
+		public IEnumerable<DomainEvent<TKey>> LoadEvents(TKey aggregateID)
 		{
 			return LoadEvents(_eventPath, aggregateID);
 		}
 
-		public IEnumerable<IDomainEvent<TKey>> LoadEventsSince(TKey aggregateID, DateTime? stamp)
+		public IEnumerable<DomainEvent<TKey>> LoadEventsSince(TKey aggregateID, DateTime? stamp)
 		{
 			var events = LoadEvents(aggregateID);
 
@@ -31,7 +31,7 @@ namespace Ledger.Stores.Fs
 				: events;
 		}
 
-		public ISnapshot<TKey> LoadLatestSnapshotFor(TKey aggregateID)
+		public Snapshot<TKey> LoadLatestSnapshotFor(TKey aggregateID)
 		{
 			return LoadLatestSnapshotFor(_snapshotPath, aggregateID);
 		}
@@ -43,7 +43,7 @@ namespace Ledger.Stores.Fs
 				.Distinct();
 		}
 
-		public IEnumerable<IDomainEvent<TKey>> LoadAllEvents()
+		public IEnumerable<DomainEvent<TKey>> LoadAllEvents()
 		{
 			return ReadFrom<EventDto<TKey>>(_eventPath)
 				.Select(dto => dto.Event);
