@@ -11,7 +11,7 @@ namespace Ledger.Stores.Fs.Tests
 {
 	public class EventSaveLoadTests : IDisposable
 	{
-		private static readonly EventStoreContext StreamName =  new EventStoreContext("streamName", Default.SerializerSettings);
+		private static readonly EventStoreContext StreamName =  new EventStoreContext("streamName", new DefaultTypeResolver());
 
 		private readonly string _root;
 		private readonly FileEventStore _store;

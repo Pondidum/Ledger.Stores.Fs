@@ -12,7 +12,7 @@ namespace Ledger.Stores.Fs.Tests
 {
 	public class LoadAllTests
 	{
-		private static readonly EventStoreContext StreamName = new EventStoreContext("LoadStream", Default.SerializerSettings);
+		private static readonly EventStoreContext StreamName = new EventStoreContext("LoadStream", new DefaultTypeResolver());
 
 		private readonly string _root;
 		private readonly FileEventStore _store;
