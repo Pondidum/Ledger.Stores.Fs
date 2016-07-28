@@ -22,7 +22,7 @@ namespace Ledger.Stores.Fs
 		public int GetNumberOfEventsSinceSnapshotFor(TKey aggregateID)
 		{
 			var last = LoadLatestSnapshotFor(_snapshotPath, aggregateID);
-			var sequence = last?.Sequence ?? -1;
+			var sequence = last?.Sequence ?? Sequence.Start;
 
 			return LoadEvents(_eventPath, aggregateID)
 				.Count(e => e.Sequence > sequence);
@@ -38,10 +38,10 @@ namespace Ledger.Stores.Fs
 			AppendTo(_snapshotPath, new[] { new SnapshotDto<TKey> { ID = snapshot.AggregateID, Snapshot = snapshot } });
 		}
 
-		public int? GetLatestSequenceFor(TKey aggregateID)
+		public Sequence? GetLatestSequenceFor(TKey aggregateID)
 		{
 			return LoadEvents(_eventPath, aggregateID)
-				.Select(e => (int?)e.Sequence)
+				.Select(e => e.Sequence)
 				.Max();
 		}
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ledger.Infrastructure;
 using Newtonsoft.Json;
 
 namespace Ledger.Stores.Fs
@@ -22,12 +23,12 @@ namespace Ledger.Stores.Fs
 			return LoadEvents(_eventPath, aggregateID);
 		}
 
-		public IEnumerable<DomainEvent<TKey>> LoadEventsSince(TKey aggregateID, DateTime? stamp)
+		public IEnumerable<DomainEvent<TKey>> LoadEventsSince(TKey aggregateID, Sequence? sequence)
 		{
 			var events = LoadEvents(aggregateID);
 
-			return stamp.HasValue
-				? events.Where(e => e.Stamp > stamp)
+			return sequence.HasValue
+				? events.Where(e => e.Sequence > sequence)
 				: events;
 		}
 
