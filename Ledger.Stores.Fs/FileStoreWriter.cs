@@ -38,7 +38,7 @@ namespace Ledger.Stores.Fs
 		public Sequence? GetLatestSequenceFor(TKey aggregateID)
 		{
 			return LoadEvents(_eventPath, aggregateID)
-				.Select(e => e.Sequence)
+				.Select(e => (Sequence?)e.Sequence)
 				.Max();
 		}
 

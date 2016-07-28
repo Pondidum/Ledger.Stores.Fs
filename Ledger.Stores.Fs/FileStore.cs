@@ -51,6 +51,7 @@ namespace Ledger.Stores.Fs
 		protected IEnumerable<DomainEvent<TKey>> LoadEvents<TKey>(string eventPath, TKey aggregateID)
 		{
 			return ReadFrom<EventDto<TKey>>(eventPath)
+				.Apply((dto, i) => dto.Event.StreamSequence = new StreamSequence(i))
 				.Where(dto => Equals(dto.ID, aggregateID))
 				.Select(dto => dto.Event);
 		}
