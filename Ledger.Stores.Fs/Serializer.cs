@@ -7,6 +7,7 @@ namespace Ledger.Stores.Fs
 	{
 		private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
 		{
+			ContractResolver = new IgnoreStreamSequenceContractResolver(),
 			TypeNameHandling = TypeNameHandling.Auto,
 			Converters = new JsonConverter[] { new SequenceJsonConverter() }
 		};

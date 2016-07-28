@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Ledger.Acceptance;
 using Ledger.Acceptance.TestDomain.Events;
 using Ledger.Infrastructure;
 using Newtonsoft.Json;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -106,6 +108,29 @@ namespace Ledger.Stores.Fs.Tests
 			var loaded = _store.CreateReader<Guid>(StreamName).LoadEventsSince(id, 4.AsSequence());
 
 			loaded.ShouldBeEmpty();
+		}
+
+		[Fact]
+		public void When_writing_an_event_the_format_is_correct()
+		{
+			var stream = new MemoryStream();
+
+			var fs = Substitute.For<IFileSystem>();
+			fs.AppendTo(Arg.Any<string>()).Returns(stream);
+
+			var store = new FileEventStore(fs, "store");
+
+			var e = new FixNameSpelling { AggregateID = Guid.NewGuid(), NewName = "Name", Stamp = DateTime.Now, Sequence = new Sequence(25) };
+
+			using (var writer = store.CreateWriter<Guid>(StreamName))
+			{
+				writer.SaveEvents(new [] { e });
+			}
+
+			var json = Encoding.UTF8.GetString(stream.ToArray()).Trim();
+
+			json.ShouldNotContain("StreamSequence");
+
 		}
 
 		public void Dispose()
