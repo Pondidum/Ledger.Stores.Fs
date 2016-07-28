@@ -36,7 +36,7 @@ namespace Ledger.Stores.Fs
 				string line;
 				while ((line = sr.ReadLine()) != null)
 				{
-					yield return JsonConvert.DeserializeObject<TDto>(line, _jsonSettings);
+					yield return Serializer.Deserialize<TDto>(line);
 				}
 			}
 		}
@@ -47,7 +47,7 @@ namespace Ledger.Stores.Fs
 			using (var sw = new StreamWriter(fs))
 			{
 				changes
-					.Select(change => JsonConvert.SerializeObject(change, _jsonSettings))
+					.Select(change => Serializer.Serialize(change))
 					.ForEach(json => sw.WriteLine(json));
 			}
 		}
