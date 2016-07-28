@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Ledger.Infrastructure;
-using Newtonsoft.Json;
 
 namespace Ledger.Stores.Fs
 {
@@ -12,8 +9,8 @@ namespace Ledger.Stores.Fs
 		private readonly string _eventPath;
 		private readonly string _snapshotPath;
 
-		public FileStoreWriter(IFileSystem fileSystem, JsonSerializerSettings jsonSettings, string eventPath, string snapshotPath)
-			: base(fileSystem, jsonSettings)
+		public FileStoreWriter(IFileSystem fileSystem, string eventPath, string snapshotPath)
+			: base(fileSystem)
 		{
 			_eventPath = eventPath;
 			_snapshotPath = snapshotPath;

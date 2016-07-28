@@ -1,21 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ledger.Infrastructure;
-using Newtonsoft.Json;
 
 namespace Ledger.Stores.Fs
 {
 	public class FileStore
 	{
 		private readonly IFileSystem _fileSystem;
-		private readonly JsonSerializerSettings _jsonSettings;
 
-		public FileStore(IFileSystem fileSystem, JsonSerializerSettings jsonSettings)
+		public FileStore(IFileSystem fileSystem)
 		{
 			_fileSystem = fileSystem;
-			_jsonSettings = jsonSettings;
 		}
 
 		protected IEnumerable<TDto> ReadFrom<TDto>(string filepath)
