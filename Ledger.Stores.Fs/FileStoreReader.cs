@@ -49,6 +49,12 @@ namespace Ledger.Stores.Fs
 				.Select(dto => dto.Event);
 		}
 
+		public IEnumerable<DomainEvent<TKey>> LoadAllEventsSince(StreamSequence streamSequence)
+		{
+			return LoadAllEvents()
+				.Where(e => e.StreamSequence > streamSequence);
+		}
+
 
 		public virtual void Dispose()
 		{
